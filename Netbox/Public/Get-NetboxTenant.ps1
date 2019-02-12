@@ -1,4 +1,4 @@
-function Get-NbTenant {
+function Get-NetboxTenant {
     [CmdletBinding()]
 
     Param (
@@ -7,7 +7,7 @@ function Get-NbTenant {
     )
 
     BEGIN {
-        $VerbosePrefix = "Get-NbTenant:"
+        $VerbosePrefix = "Get-NetboxTenant:"
         $ReturnObject = @()
     }
 

@@ -1,4 +1,4 @@
-function Connect-NbServer {
+function Connect-NetboxServer {
     [CmdletBinding()]
 
     Param (
@@ -22,7 +22,7 @@ function Connect-NbServer {
     )
 
     BEGIN {
-        $VerbosePrefix = "Connect-NbServer:"
+        $VerbosePrefix = "Connect-NetboxServer:"
 
         if ($HttpOnly) {
             $Protocol = "http"
