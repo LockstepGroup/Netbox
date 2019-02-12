@@ -33,7 +33,7 @@ class NetboxServer {
     #endregion getApiUrl
 
     #region invokeApiQuery
-    [xml] invokeApiQuery([string]$queryPage) {
+    [PSCustomObject] invokeApiQuery([string]$queryPage) {
         # If the query is not a GetPassHash query we need to append the PassHash and UserName to the query string
         $uri = $this.getApiUrl($queryPage)
 
@@ -47,7 +47,7 @@ class NetboxServer {
             $QueryParams.Uri = $uri
             $QueryParams.UseBasicParsing = $true
             $QueryParams.Headers = @{}
-            $QueryParams.Headers.Authorization = "ApiToken $($this.ApiToken)"
+            $QueryParams.Headers.Authorization = "Token $($this.ApiToken)"
             $QueryParams.Headers.Accept = 'application/json; indent=4'
 
             #region SSLIssues
@@ -86,8 +86,10 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
         }
 
         $this.RawQueryResultHistory += $rawResult
+        $jsonResult = $rawResult | ConvertFrom-Json
+        $this.LastResult = $jsonResult
 
-        return $rawResult.result
+        return $jsonResult
     }
     #endregion invokeApiQuery
 
