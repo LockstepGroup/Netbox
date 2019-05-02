@@ -6,9 +6,9 @@ class NetboxTenant {
     [string]$Comments
     [array]$Tags
 
-    # Group
-    [int]$GroupId
-    [string]$GroupName
+    # TenantGroup
+    [int]$TenantGroupId
+    [string]$TenantGroupName
 
     # Custom Fields
     [hashtable]$CustomFields
@@ -19,7 +19,7 @@ class NetboxTenant {
 
     #region Initiators
     ###################################################################################################
-    # Blank Initiator, just used for debug/troubleshooting
+    # Blank Initiator
     NetboxTenant() {
     }
 

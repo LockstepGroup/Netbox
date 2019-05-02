@@ -1,20 +1,23 @@
-function Get-NetboxTenant {
+function Get-NetboxSite {
     [CmdletBinding()]
 
     Param (
         [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True, Position = 0)]
+        [string]$SiteId,
+
+        [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True)]
         [string]$TenantId
     )
 
     BEGIN {
-        $VerbosePrefix = "Get-NetboxTenant:"
+        $VerbosePrefix = "Get-NetboxSite:"
         $ReturnObject = @()
     }
 
     PROCESS {
-        $QueryPage = 'tenancy/tenants/'
-        if ($TenantId) {
-            $QueryPage += $TenantId + '/'
+        $QueryPage = 'dcim/sites/'
+        if ($SiteId) {
+            $QueryPage += $SiteId + '/'
         }
 
         try {
@@ -34,14 +37,14 @@ function Get-NetboxTenant {
 
             $New.TenantId = $r.id
             $New.Name = $r.name
-            $New.Slug = $r.slug
+            $New.Slug = $r.slg
             $New.Description = $r.description
             $New.Comments = $r.comments
             $New.Tags = $r.tags
 
             # Group
-            $New.TenantGroupId = $r.group.id
-            $New.TenantGroupName = $r.group.name
+            $New.GroupId = $r.group.id
+            $New.GroupName = $r.group.name
 
             # Custom Fields
             $New.CustomFields = $r.custom_fields

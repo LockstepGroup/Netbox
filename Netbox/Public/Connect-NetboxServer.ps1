@@ -6,11 +6,11 @@ function Connect-NetboxServer {
         [ValidatePattern("\d+\.\d+\.\d+\.\d+|(\w\.)+\w")]
         [string]$Server,
 
-        [Parameter(ParameterSetName = "PassHash", Mandatory = $True, Position = 2)]
+        [Parameter(Mandatory = $True, Position = 1)]
         [string]$ApiToken,
 
         [Parameter(Mandatory = $False, Position = 2)]
-        [int]$Port = 443,
+        [int]$Port,
 
         [Parameter(Mandatory = $False)]
         [alias('http')]
@@ -36,6 +36,9 @@ function Connect-NetboxServer {
     PROCESS {
         try {
             Write-Verbose "$VerbosePrefix Attempting to connect with provided ApiToken"
+            Write-Verbose "$VerbosePrefix Server: $Server"
+            Write-Verbose "$VerbosePrefix Protocol: $Protocol"
+            Write-Verbose "$VerbosePrefix Port: $Port"
             $global:NetboxServerConnection = [NetboxServer]::new($Server, $ApiToken, $Protocol, $Port)
         } catch {
             $PSCmdlet.ThrowTerminatingError($PSItem)

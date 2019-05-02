@@ -18,6 +18,34 @@ class NetboxServer {
     $LastError
     $LastResult
 
+    #region SkipSSL
+    static [string]$TrustAllCertsPolicy = @"
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
+public class TrustAllCertsPolicy : ICertificatePolicy {
+    public bool CheckValidationResult(
+        ServicePoint srvPoint, X509Certificate certificate,
+        WebRequest request, int certificateProblem) {
+        return true;
+    }
+}
+"@
+
+    static [bool] SkipCertificateCheck() {
+        if ($global:PSVersionTable.PSEdition -eq 'Core') {
+            return $true
+        } else {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+            try {
+                Add-Type [NetboxServer]::TrustAllCertsPolicy
+            } catch {
+            }
+            [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+            return $false
+        }
+    }
+    #endregion SkipSSL
+
     #region getApiUrl
     [String] getApiUrl([string]$queryPage) {
         if ($this.Hostname) {
@@ -50,6 +78,10 @@ class NetboxServer {
             $QueryParams.Headers.Authorization = "Token $($this.ApiToken)"
             $QueryParams.Headers.Accept = 'application/json; indent=4'
 
+            if ([NetboxServer]::SkipCertificateCheck()) {
+                $QueryParams.SkipCertificateCheck = $true
+            }
+            <#
             #region SSLIssues
             # allow week ssl and untrusted certs
             switch ($global:PSVersionTable.PSEdition) {
@@ -78,7 +110,7 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
                     continue
                 }
             }
-            #endregion SSLIssues
+            #endregion SSLIssues #>
 
             $rawResult = Invoke-WebRequest @QueryParams -Verbose:$false # doing this mostly to prevent plaintext password from being displayed by accident.
         } catch {
@@ -93,6 +125,43 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
     }
     #endregion invokeApiQuery
 
+    #region invokePostApiQuery
+    [PSCustomObject] invokePostApiQuery([string]$queryPage, [hashtable]$Body) {
+        # If the query is not a GetPassHash query we need to append the PassHash and UserName to the query string
+        $uri = $this.getApiUrl($queryPage)
+
+        #region trackHistory
+        $this.UrlHistory += $uri
+        #endregion trackHistory
+
+        # try query
+        try {
+            $QueryParams = @{}
+            $QueryParams.Uri = $uri
+            $QueryParams.UseBasicParsing = $true
+            $QueryParams.Method = 'POST'
+            $QueryParams.Headers = @{}
+            $QueryParams.Headers.Authorization = "Token $($this.ApiToken)"
+            $QueryParams.Headers.Accept = 'application/json; indent=4'
+            $QueryParams.Body = $Body
+
+            if ([NetboxServer]::SkipCertificateCheck()) {
+                $QueryParams.SkipCertificateCheck = $true
+            }
+
+            $rawResult = Invoke-WebRequest @QueryParams -Verbose:$false # doing this mostly to prevent plaintext password from being displayed by accident.
+        } catch {
+            Throw $_
+        }
+
+        $this.RawQueryResultHistory += $rawResult
+        $jsonResult = $rawResult | ConvertFrom-Json
+        $this.LastResult = $jsonResult
+
+        return $jsonResult
+    }
+    #endregion invokePostApiQuery
+
     #region Initiators
     ###################################################################################################
     # Blank Initiator, just used for debug/troubleshooting
@@ -100,7 +169,7 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
     }
 
     # Initiator with PassHash
-    NetboxServer([string]$Hostname, [string]$ApiToken, [string]$Protocol = "https", [int]$Port = 443) {
+    NetboxServer([string]$Hostname, [string]$ApiToken, [string]$Protocol = "https", [int]$Port) {
         $this.Hostname = $Hostname
         $this.ApiToken = $ApiToken
         $this.Protocol = $Protocol
