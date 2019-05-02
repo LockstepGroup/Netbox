@@ -3,7 +3,7 @@ function Get-NetboxTenantGroup {
 
     Param (
         [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'TenantGroupId', Position = 0)]
-        [string]$TenantGroupId,
+        [int]$TenantGroupId,
 
         [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'TenantGroupName', Position = 0)]
         [string]$TenantGroupName
@@ -17,7 +17,7 @@ function Get-NetboxTenantGroup {
     PROCESS {
         $QueryPage = 'tenancy/tenant-groups/'
         if ($TenantGroupId) {
-            $QueryPage += $TenantGroupId + '/'
+            $QueryPage += "$TenantGroupId/"
         }
 
         if ($TenantGroupName) {

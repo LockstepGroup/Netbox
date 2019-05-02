@@ -3,10 +3,10 @@ function Get-NetboxSite {
 
     Param (
         [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True, Position = 0)]
-        [string]$SiteId,
+        [int]$SiteId,
 
         [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True)]
-        [string]$TenantId
+        [int]$TenantId
     )
 
     BEGIN {
