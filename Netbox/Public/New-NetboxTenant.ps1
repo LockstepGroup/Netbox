@@ -8,7 +8,7 @@ function New-NetboxTenant {
         [Parameter(Mandatory = $false)]
         [string]$Slug,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
         [int]$TenantGroupId,
 
         [Parameter(Mandatory = $false)]
@@ -37,12 +37,15 @@ function New-NetboxTenant {
             name = $Name
             slug = $Slug
         }
-        $Global:test = $Body
 
-        if ($GroupId) { $Body.GroupId = $GroupId }
-        if ($Description) { $Body.Description = $Description }
-        if ($Tags) { $Body.Tags = $Tags }
-        if ($Comments) { $Body.Comments = $Comments }
+        if ($TenantGroupId) {
+            $Body.group = @{ id = $TenantGroupId }
+        }
+        if ($Description) { $Body.description = $Description }
+        if ($Tags) {
+            $Body.tags = $Tags | ConvertTo-Json -Compress
+        }
+        if ($Comments) { $Body.comments = $Comments }
 
         $Response = $global:NetboxServerConnection.invokePostApiQuery($QueryPage, $Body)
 
@@ -56,8 +59,8 @@ function New-NetboxTenant {
         $ReturnObject.Tags = $Response.tags
 
         # Group
-        $ReturnObject.GroupId = $Response.group.id
-        $ReturnObject.GroupName = $Response.group.name
+        $ReturnObject.TenantGroupId = $Response.group.id
+        $ReturnObject.TenantGroupName = $Response.group.name
 
         # Custom Fields
         $ReturnObject.CustomFields = $Response.custom_fields
