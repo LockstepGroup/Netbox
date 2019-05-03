@@ -2,60 +2,79 @@ function New-NetboxSite {
     [CmdletBinding()]
 
     Param (
-        [Parameter(Mandatory = $true, Position = 0)]
+        [Parameter(Mandatory = $true, ParameterSetName = 'nogeocoding', Position = 0)]
+        [Parameter(Mandatory = $true, ParameterSetName = 'geocoding', Position = 0)]
         [string]$Name,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [string]$Slug,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [ValidateSet('Active', 'Planned', 'Retired')]
         [string]$Status,
 
-        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'geocoding')]
         [int]$RegionId,
 
-        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'geocoding')]
         [int]$TenantId,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [string]$Facility,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [int]$Asn,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [string]$TimeZone,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [string]$Description,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'geocoding')]
         [string]$PhysicalAddress,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [string]$ShippingAddress,
 
-        [Parameter(Mandatory = $false)]
-        [string]$Latitude,
-
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
         [string]$Longitude,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [string]$Latitude,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [string]$ContactName,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [string]$ContactPhone,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [string]$ContactEmail,
 
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
         [string]$Comments,
 
-        [Parameter(Mandatory = $false)]
-        [string[]]$Tags
+        [Parameter(Mandatory = $false, ParameterSetName = 'nogeocoding')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'geocoding')]
+        [string[]]$Tags,
+
+        [Parameter(Mandatory = $true, ParameterSetName = 'geocoding')]
+        [switch]$ResolveCoordinates
     )
 
     BEGIN {
@@ -92,10 +111,14 @@ function New-NetboxSite {
         }
 
         # Region
-        if ($RegionId) { $Body.region = $RegionId }
+        if ($RegionId) {
+            $Body.region = $RegionId
+        }
 
         # TenantId
-        if ($TenantId) { $Body.tenant = $TenantId }
+        if ($TenantId) {
+            $Body.tenant = $TenantId
+        }
 
         # Facilty
         if ($Facility) { $Body.facility = $Facility }
@@ -115,11 +138,18 @@ function New-NetboxSite {
         # ShippingAddress
         if ($ShippingAddress) { $Body.shipping_address = $ShippingAddress }
 
+        # Longitude
+        if ($Longitude) { $Body.longitude = $Longitude }
+
         # Latitude
         if ($Latitude) { $Body.latitude = $Latitude }
 
-        # Longitude
-        if ($Longitude) { $Body.longitude = $Longitude }
+        # Resolve Coordinates
+        if ($ResolveCoordinates) {
+            $Lookup = Get-GeoCoding -Address $PhysicalAddress
+            $Body.longitude = [math]::Round($Lookup.Longitude, 6)
+            $Body.latitude = [math]::Round($Lookup.Latitude, 6)
+        }
 
         # ContactName
         if ($ContactName) { $Body.contact_name = $ContactName }

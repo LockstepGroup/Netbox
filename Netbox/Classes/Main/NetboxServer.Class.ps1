@@ -14,6 +14,7 @@ class NetboxServer {
     [int]$CurrentStartPosition = 0
     hidden [bool]$Connected
     [array]$UrlHistory
+    [array]$RawQueryHistory
     [array]$RawQueryResultHistory
     $LastError
     $LastResult
@@ -60,6 +61,7 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
     }
     #endregion getApiUrl
 
+    ##############################################################
     #region invokeApiQuery
     [PSCustomObject] invokeApiQuery([string]$queryPage) {
         # If the query is not a GetPassHash query we need to append the PassHash and UserName to the query string
@@ -124,7 +126,9 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
         return $jsonResult
     }
     #endregion invokeApiQuery
+    ##############################################################
 
+    ##############################################################
     #region invokePostApiQuery
     [PSCustomObject] invokePostApiQuery([string]$queryPage, [hashtable]$Body) {
         # If the query is not a GetPassHash query we need to append the PassHash and UserName to the query string
@@ -132,6 +136,10 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
 
         #region trackHistory
         $this.UrlHistory += $uri
+        $this.RawQueryHistory += @{
+            Uri  = $uri
+            Body = $Body
+        }
         #endregion trackHistory
 
         # try query
@@ -143,7 +151,8 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
             $QueryParams.Headers = @{}
             $QueryParams.Headers.Authorization = "Token $($this.ApiToken)"
             $QueryParams.Headers.Accept = 'application/json; indent=4'
-            $QueryParams.Body = $Body
+            $QueryParams.ContentType = 'application/json'
+            $QueryParams.Body = $Body | ConvertTo-Json -Compress
 
             if ([NetboxServer]::SkipCertificateCheck()) {
                 $QueryParams.SkipCertificateCheck = $true
@@ -161,6 +170,50 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
         return $jsonResult
     }
     #endregion invokePostApiQuery
+    ##############################################################
+
+    ##############################################################
+    #region invokeDeleteApiQuery
+    [PSCustomObject] invokeDeleteApiQuery([string]$queryPage) {
+        # If the query is not a GetPassHash query we need to append the PassHash and UserName to the query string
+        $uri = $this.getApiUrl($queryPage)
+
+        #region trackHistory
+        $this.UrlHistory += $uri
+        $this.RawQueryHistory += @{
+            Uri  = $uri
+            Body = $null
+        }
+        #endregion trackHistory
+
+        # try query
+        try {
+            $QueryParams = @{}
+            $QueryParams.Uri = $uri
+            $QueryParams.UseBasicParsing = $true
+            $QueryParams.Method = 'DELETE'
+            $QueryParams.Headers = @{}
+            $QueryParams.Headers.Authorization = "Token $($this.ApiToken)"
+            $QueryParams.Headers.Accept = 'application/json; indent=4'
+            $QueryParams.ContentType = 'application/json'
+
+            if ([NetboxServer]::SkipCertificateCheck()) {
+                $QueryParams.SkipCertificateCheck = $true
+            }
+
+            $rawResult = Invoke-WebRequest @QueryParams -Verbose:$false # doing this mostly to prevent plaintext password from being displayed by accident.
+        } catch {
+            Throw $_
+        }
+
+        $this.RawQueryResultHistory += $rawResult
+        $jsonResult = $rawResult | ConvertFrom-Json
+        $this.LastResult = $jsonResult
+
+        return $jsonResult
+    }
+    #endregion invokeDeleteApiQuery
+    ##############################################################
 
     #region Initiators
     ###################################################################################################
