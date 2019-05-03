@@ -130,7 +130,7 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
 
     ##############################################################
     #region invokePostApiQuery
-    [PSCustomObject] invokePostApiQuery([string]$queryPage, [hashtable]$Body) {
+    [PSCustomObject] invokePostApiQuery([string]$queryPage, [string]$Body) {
         # If the query is not a GetPassHash query we need to append the PassHash and UserName to the query string
         $uri = $this.getApiUrl($queryPage)
 
@@ -152,7 +152,7 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
             $QueryParams.Headers.Authorization = "Token $($this.ApiToken)"
             $QueryParams.Headers.Accept = 'application/json; indent=4'
             $QueryParams.ContentType = 'application/json'
-            $QueryParams.Body = $Body | ConvertTo-Json -Compress
+            $QueryParams.Body = $Body
 
             if ([NetboxServer]::SkipCertificateCheck()) {
                 $QueryParams.SkipCertificateCheck = $true

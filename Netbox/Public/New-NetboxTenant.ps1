@@ -47,7 +47,7 @@ function New-NetboxTenant {
         }
         if ($Comments) { $Body.comments = $Comments }
 
-        $Response = $global:NetboxServerConnection.invokePostApiQuery($QueryPage, $Body)
+        $Response = $global:NetboxServerConnection.invokePostApiQuery($QueryPage, ($Body | ConvertTo-Json -Compress))
 
         $ReturnObject = [NetboxTenant]::new()
 

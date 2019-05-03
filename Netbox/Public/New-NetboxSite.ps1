@@ -174,7 +174,7 @@ function New-NetboxSite {
         ###############################################################
         #region invokeQuery
 
-        $Response = $global:NetboxServerConnection.invokePostApiQuery($QueryPage, $Body)
+        $Response = $global:NetboxServerConnection.invokePostApiQuery($QueryPage, ($Body | ConvertTo-Json -Compress))
 
         #endregion invokeQuery
         ###############################################################
