@@ -1,23 +1,25 @@
 function Get-NetboxTenant {
-    [CmdletBinding(DefaultParametersetName = "TenantId")]
+    [CmdletBinding()]
 
     Param (
-        [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'TenantId', Position = 0)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'TenantId')]
         [int]$TenantId,
 
-        [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'TenantName', Position = 0)]
+        [Parameter(Mandatory = $true, ParameterSetName = 'TenantName')]
         [string]$TenantName,
 
-        [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True, ParameterSetName = 'TenantGroupId')]
-        [int]$TenantGroupId
+        [Parameter(Mandatory = $true, ValueFromPipeline = $True, ParameterSetName = 'TenantGroup')]
+        [NetboxTenantGroup]$NetboxTenantGroup
     )
 
     BEGIN {
         $VerbosePrefix = "Get-NetboxTenant:"
+        Write-Verbose "$VerbosePrefix ParameterSetName (BEGIN): $($PSCmdlet.ParameterSetName)"
         $ReturnObject = @()
     }
 
     PROCESS {
+        Write-Verbose "$VerbosePrefix ParameterSetName (PROCESS): $($PSCmdlet.ParameterSetName)"
         $QueryPage = 'tenancy/tenants/'
         if ($TenantId) {
             $QueryPage += "$TenantId/"
@@ -25,6 +27,10 @@ function Get-NetboxTenant {
 
         if ($TenantName) {
             $QueryPage += '?name=' + $TenantName
+        }
+
+        if ($NetboxTenantGroup) {
+            $QueryPage += '?group=' + $NetboxTenantGroup.Slug
         }
 
         try {
@@ -47,7 +53,7 @@ function Get-NetboxTenant {
             $ReturnObject += $New
 
             $New.TenantId = $r.id
-            $New.Name = $r.name
+            $New.TenantName = $r.name
             $New.Slug = $r.slug
             $New.Description = $r.description
             $New.Comments = $r.comments
@@ -67,6 +73,7 @@ function Get-NetboxTenant {
     }
 
     END {
+        Write-Verbose "$VerbosePrefix ParameterSetName (END): $($PSCmdlet.ParameterSetName)"
         $ReturnObject
     }
 }

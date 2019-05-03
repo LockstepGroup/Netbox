@@ -1,6 +1,6 @@
 class NetboxTenant {
     [int]$TenantId
-    [string]$Name
+    [string]$TenantName
     [string]$Slug
     [string]$Description
     [string]$Comments

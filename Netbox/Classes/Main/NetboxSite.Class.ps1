@@ -1,20 +1,48 @@
 class NetboxSite {
     [int]$SiteId
-    [string]$Name
+    [string]$SiteName
     [string]$Slug
+    [array]$Tags
 
     # Status
-    [int]$StatusId
+    [int]$StatusValue
     [string]$Status
 
     # Region
     [int]$RegionId
-    [string]$Region
+    [string]$RegionName
 
     # Tenant
     [int]$TenantId
-    [string]$Tenant
+    [string]$TenantName
 
+    # Details
+    [string]$Facility
+    [int]$ASN
+    [string]$TimeZone
+    [string]$Description
+    [string]$PhysicalAddress
+    [string]$ShippingAddress
+    [string]$Latitude
+    [string]$Longitude
+    [string]$ContactName
+    [string]$ContactPhone
+    [string]$ContactEmail
+    [string]$Comments
+
+    # Counts
+    [int]$PrefixCount
+    [int]$VlanCount
+    [int]$RackCount
+    [int]$DeviceCount
+    [int]$CircuitCount
+
+    # Custom Fields
+    [hashtable]$CustomFields
+
+    #Timestamps
+    [datetime]$Created
+    [datetime]$LastUpdated
 
     #region Initiators
     ###################################################################################################

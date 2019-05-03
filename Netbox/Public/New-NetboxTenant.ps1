@@ -52,7 +52,7 @@ function New-NetboxTenant {
         $ReturnObject = [NetboxTenant]::new()
 
         $ReturnObject.TenantId = $Response.id
-        $ReturnObject.Name = $Response.name
+        $ReturnObject.TenantName = $Response.name
         $ReturnObject.Slug = $Response.slug
         $ReturnObject.Description = $Response.description
         $ReturnObject.Comments = $Response.comments
