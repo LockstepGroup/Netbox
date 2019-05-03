@@ -71,15 +71,19 @@ function Get-NetboxSite {
             $New.ContactEmail = $r.contact_email
             $New.Comments = $r.comments
 
+            # Custom Fields
+            $New.CustomFields = $r.custom_fields
+
+            #Timestamps
+            $New.Created = $r.created
+            $New.LastUpdated = $r.last_updated
+
             # Counts
             $New.PrefixCount = $r.count_prefixes
             $New.VlanCount = $r.count_vlans
             $New.RackCount = $r.count_racks
             $New.DeviceCount = $r.count_devices
             $New.CircuitCount = $r.count_circuits
-
-            # Custom Fields
-            $New.CustomFields = $r.custom_fields
         }
     }
 
