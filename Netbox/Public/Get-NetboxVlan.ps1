@@ -9,13 +9,18 @@ function Get-NetboxVlan {
         [NetboxTenant]$NetboxTenant,
 
         [Parameter(Mandatory = $true, ValueFromPipeline = $True, ParameterSetName = 'NetboxSite')]
-        [NetboxSite]$NetboxSite
+        [NetboxSite]$NetboxSite,
+
+        [Parameter(Mandatory = $false, ParameterSetName = 'NetboxSite')]
+        [Parameter(Mandatory = $false, ParameterSetName = 'NetboxTenant')]
+        [int]$VlanTag
     )
 
     BEGIN {
         $VerbosePrefix = "Get-NetboxVlan:"
         Write-Verbose "$VerbosePrefix ParameterSetName (BEGIN): $($PSCmdlet.ParameterSetName)"
         $ReturnObject = @()
+        $QueryHashTable = @{}
     }
 
     PROCESS {
@@ -29,17 +34,25 @@ function Get-NetboxVlan {
 
         if ($NetboxTenant) {
             Write-Verbose "$VerbosePrefix Setting TenantSlug: $($NetboxTenant.slug)"
-            $QueryPage += '?tenant=' + $NetboxTenant.slug
+            $QueryHashTable.tenant = $NetboxTenant.slug
+            #$QueryPage += '?tenant=' + $NetboxTenant.slug
         }
 
         if ($NetboxSite) {
             Write-Verbose "$VerbosePrefix Setting TenantSlug: $($NetboxSite.slug)"
-            $QueryPage += '?site=' + $NetboxSite.slug
+            $QueryHashTable.site = $NetboxSite.slug
+            #$QueryPage += '?site=' + $NetboxSite.slug
+        }
+
+        if ($VlanTag) {
+            Write-Verbose "$VerbosePrefix Setting VlanTag: $($VlanTag)"
+            $QueryHashTable.vid = $VlanTag
+            #$QueryPage += '?vid=' + $VlanTag
         }
 
         try {
-            $Response = $global:NetboxServerConnection.invokeApiQuery($QueryPage)
             Write-Verbose "$VerbosePrefix QueryPage: $QueryPage"
+            $Response = $global:NetboxServerConnection.invokeApiQuery($QueryPage, $QueryHashTable)
             if ($TenantName -and ($Response.count -eq 0)) {
                 Write-Warning "$VerbosePrefix No results found, keep in mind that all netbox names are case-sensitive."
             } else {

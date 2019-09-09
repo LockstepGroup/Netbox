@@ -61,6 +61,30 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
     }
     #endregion getApiUrl
 
+    # Create query string
+    static [string] createQueryString ([hashtable]$hashTable) {
+        $i = 0
+        $queryString = "?"
+        foreach ($hash in $hashTable.GetEnumerator()) {
+            $i++
+            $queryString += $hash.Name + "=" + $hash.Value
+            if ($i -lt $HashTable.Count) {
+                $queryString += "&"
+            }
+        }
+        return $queryString
+    }
+
+    ##############################################################
+    #region invokeApiQueryWithHash
+    [PSCustomObject] invokeApiQuery([string]$queryPage, [hashtable]$queryHashtable) {
+        $queryString = [NetboxServer]::createQueryString($queryHashtable)
+        $fullQueryPage = $queryPage + $queryString
+        return $this.invokeApiQuery($fullQueryPage)
+    }
+    #endregion invokeApiQueryWithHash
+    ##############################################################
+
     ##############################################################
     #region invokeApiQuery
     [PSCustomObject] invokeApiQuery([string]$queryPage) {
