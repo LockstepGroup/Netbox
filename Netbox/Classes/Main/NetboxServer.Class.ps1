@@ -158,6 +158,16 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
         # If the query is not a GetPassHash query we need to append the PassHash and UserName to the query string
         $uri = $this.getApiUrl($queryPage)
 
+        #region getMethod
+        $BodyObject = $Body | ConvertFrom-Json
+        if ($BodyObject.Id -gt 0) {
+            $Method = 'PATCH'
+            $uri += "$($BodyObject.Id)/"
+        } else {
+            $Method = 'POST'
+        }
+        #endregion getMethod
+
         #region trackHistory
         $this.UrlHistory += $uri
         $this.RawQueryHistory += @{
@@ -171,7 +181,7 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
             $QueryParams = @{}
             $QueryParams.Uri = $uri
             $QueryParams.UseBasicParsing = $true
-            $QueryParams.Method = 'POST'
+            $QueryParams.Method = $Method
             $QueryParams.Headers = @{}
             $QueryParams.Headers.Authorization = "Token $($this.ApiToken)"
             $QueryParams.Headers.Accept = 'application/json; indent=4'
@@ -182,6 +192,7 @@ public class TrustAllCertsPolicy : ICertificatePolicy {
                 $QueryParams.SkipCertificateCheck = $true
             }
 
+            $global:test = $QueryParams
             $rawResult = Invoke-WebRequest @QueryParams -Verbose:$false # doing this mostly to prevent plaintext password from being displayed by accident.
         } catch {
             Throw $_

@@ -1,18 +1,18 @@
-function Remove-NetboxVlan {
+function Remove-NetboxVrf {
     [CmdletBinding()]
 
     Param (
         [Parameter(Mandatory = $False, ValueFromPipelineByPropertyName = $True, Position = 0)]
-        [int]$VlanId
+        [int]$VrfId
     )
 
     BEGIN {
-        $VerbosePrefix = "Remove-NetboxVlan:"
-        $QueryPage = [NetboxVlan]::BaseQueryPage
+        $VerbosePrefix = "Remove-NetboxVrf:"
+        $QueryPage = [NetboxVrf]::BaseQueryPage
     }
 
     PROCESS {
-        $QueryPage = $QueryPage + $VlanId + '/'
+        $QueryPage = $QueryPage + $VrfId + '/'
         Write-Verbose "$VerbosePrefix QueryPage: $QueryPage"
         $Response = $global:NetboxServerConnection.invokeDeleteApiQuery($QueryPage)
     }

@@ -47,26 +47,6 @@ function New-NetboxVlan {
         # format slug correctly
         $Slug = Resolve-SlugName -Slug $Slug
 
-        <# $Body = @{
-            name   = $Name
-            slug   = $Slug
-            vid    = $VlanTag
-            status = $StatusMap.$Status
-        }
-
-        if ($Site) {
-            $Body.site = @{ id = $SiteId }
-        }
-        if ($TenantId) {
-            $Body.tenant = @{ id = $TenantId }
-        }
-        if ($Description) { $Body.description = $Description }
-        if ($Tags) {
-            $Body.tags = $Tags | ConvertTo-Json -Compress
-        }
-
-        $Response = $global:NetboxServerConnection.invokePostApiQuery($QueryPage, ($Body | ConvertTo-Json -Compress)) #>
-
         $ReturnObject = [NetboxVlan]::new()
 
         $ReturnObject.VlanTag = $VlanTag

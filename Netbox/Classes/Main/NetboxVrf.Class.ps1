@@ -1,15 +1,10 @@
-class NetboxVlan {
-    [int]$VlanId
-    [int]$VlanTag
-    [string]$VlanName
-    [string]$Slug
-    [string]$Status
+class NetboxVrf {
+    [int]$VrfId
+    [string]$VrfName
+    [string]$RouteDistinguisher
+    [bool]$EnforceUniqueSpace
     [string]$Description
     [array]$Tags
-
-    # Site
-    [int]$SiteId
-    [string]$SiteName
 
     # Tenant
     [int]$TenantId
@@ -23,7 +18,7 @@ class NetboxVlan {
     [datetime]$Created
     [datetime]$LastUpdated
 
-    static [string]$BaseQueryPage = 'ipam/vlans/'
+    static [string]$BaseQueryPage = 'ipam/vrfs/'
 
     ###################################################################################################
     #region Methods
@@ -32,7 +27,7 @@ class NetboxVlan {
     #region GetFullQueryPage
 
     [string] GetFullQueryPage() {
-        $FullQueryPage = [NetboxVlan]::BaseQueryPage + $this.VlanId + '/'
+        $FullQueryPage = [NetboxVrf]::BaseQueryPage + $this.VlanId + '/'
         return $FullQueryPage
     }
 
@@ -42,18 +37,10 @@ class NetboxVlan {
     ######################################################
     #region MakeJson
     [string] ToJson() {
-        $StatusMap = @{
-            Active     = 1
-            Reserved   = 2
-            Deprecated = 3
-        }
-
         $Json = @{
-            vid    = $this.VlanTag
-            name   = $this.VlanName
-            status = $StatusMap."$($this.Status)"
-            slug   = $this.slug
-            id     = $this.VlanId
+            name = $this.VrfName
+            rd   = $this.RouteDistinguisher
+            id   = $this.VrfId
         }
 
         if ($this.Description) {
@@ -64,14 +51,9 @@ class NetboxVlan {
             $Json.tags = $this.Tags
         }
 
-        if ($this.SiteId) {
-            $Json.site = $this.SiteId
-        }
-
         if ($this.TenantId) {
             $Json.tenant = $this.TenantId
         }
-
 
         $Json = $Json | ConvertTo-Json -Compress
 
@@ -89,7 +71,7 @@ class NetboxVlan {
     ######################################################
     #region EmptyConstructor
 
-    NetboxVlan() {
+    NetboxVrf() {
     }
 
     #endregion EmptyConstructor
