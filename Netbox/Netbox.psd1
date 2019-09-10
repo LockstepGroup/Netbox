@@ -12,7 +12,7 @@
     RootModule        = 'Netbox'
 
     # Version number of this module.
-    ModuleVersion     = '0.0.2'
+    ModuleVersion     = '1.0.0'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -112,7 +112,15 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            # ReleaseNotes = ''
+            ReleaseNotes = @'
+1.0 Release
+
+New Cmdlets
+* Get/New/Set/Remove-IpAddress
+* Get/New/Set/Remove-Prefix
+* Get/New/Set/Remove-Vrf
+* Get/New/Set/Remove-Vlan
+'@
 
         } # End of PSData hashtable
 
@@ -125,5 +133,6 @@
     # DefaultCommandPrefix = ''
 
 }
+
 
 
