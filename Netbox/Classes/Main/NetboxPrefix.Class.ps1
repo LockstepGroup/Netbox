@@ -60,11 +60,6 @@ class NetboxPrefix {
             Deprecated = 3
         }
 
-        $IpFamilyMap = @{
-            IPv4 = 4
-            IPv6 = 6
-        }
-
         $Json = @{
             prefix  = $this.Prefix
             status  = $StatusMap."$($this.Status)"
