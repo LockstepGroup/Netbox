@@ -66,18 +66,17 @@ class NetboxPrefix {
         }
 
         $Json = @{
-            id      = $this.NetboxId
-            family  = $IpFamilyMap."$($this.IpFamily)"
             prefix  = $this.Prefix
             status  = $StatusMap."$($this.Status)"
             is_pool = $this.IsPool
+            id      = $this.NetboxId
         }
 
         if ($this.SiteId) {
             $Json.site = $this.SiteId
         }
 
-        if ($this.Vrf) {
+        if ($this.VrfId) {
             $Json.vrf = $this.VrfId
         }
 

@@ -25,6 +25,9 @@ function New-NetboxPrefix {
         [int]$VlanId,
 
         [Parameter(Mandatory = $false)]
+        [Switch]$IsPool,
+
+        [Parameter(Mandatory = $false)]
         [string]$Description,
 
         [Parameter(Mandatory = $false)]
@@ -49,9 +52,11 @@ function New-NetboxPrefix {
         $ReturnObject.Prefix = $Prefix
         $ReturnObject.Status = $Status
         $ReturnObject.VrfId = $VrfId
+        $ReturnObject.RoleId = $RoleId
         $ReturnObject.TenantId = $TenantId
         $ReturnObject.SiteId = $SiteId
         $ReturnObject.VlanId = $VlanId
+        $ReturnObject.IsPool = $IsPool
         $ReturnObject.Description = $Description
         $ReturnObject.Tags = $Tags
     }
