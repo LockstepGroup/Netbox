@@ -35,13 +35,6 @@ class NetboxIpAddress {
     [int]$NatOutsideId
     [string]$NatOutsideAddress
 
-    # Site
-    [int]$SiteId
-    [string]$SiteName
-    [int]$VlanId
-    [int]$VlanTag
-    [string]$VlanName
-
     # Tags
     [array]$Tags
 
@@ -84,6 +77,11 @@ class NetboxIpAddress {
             status      = $StatusMap."$($this.Status)"
             description = $this.Description
             tags        = $this.Tags
+        }
+
+        # Vrf
+        if ($this.VrfId) {
+            $Json.vrf = $this.VrfId
         }
 
         # Tenant
