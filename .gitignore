@@ -31,5 +31,8 @@ config.json*
 # Log Files
 *.log
 
+# Test results
+cov.xml
+
 # testing file
 testing.ps1
